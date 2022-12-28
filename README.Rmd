@@ -1,0 +1,49 @@
+---
+output: github_document
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# missCforest
+
+`missCforest` is an Ensemble Conditional Trees algorithm for Missing Data Imputation. It performs single imputation based on the `Cforest` algorithm.
+
+The goal of `missCforest` is to produce a complete dataset using an iterative prediction approach by predicting missing values by learning from the complete cases.
+
+## Installation
+
+You can install the development version of `missCforest` as follow:
+
+``` r
+#install.packages("devtools")
+devtools::install_github("ielbadisy/missCforest")
+```
+
+## Examples
+
+```{r}
+library(missCforest)
+# import the iris dataset 
+data(iris)
+
+# introduce randomly 30% of NA to variables
+irisNA <- generateNA(iris, 0.3)
+summary(irisNA)
+```
+
+
+You can impute all the missing values using all the possible combinations of the imputation model formula:
+
+```{r}
+irisImp <- missCforest(irisNA, .~.)  
+summary(irisImp)
+```
+

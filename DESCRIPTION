@@ -1,0 +1,21 @@
+Package: missCforest
+Title: Ensemble Conditional Trees for Missing Data Imputation
+Version: 0.0.1
+Authors@R: 
+    person(given = "Imad",
+           family = "EL BADISY",
+           role = c("aut", "cre", "cph"),
+           email = "elbadisyimad@gmail.com")
+Description: Single imputation based on the Ensemble Conditional Trees Cforest algorithm.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+URL: https://github.com/ielbadisy/missCforest
+BugReports: https://github.com/ielbadisy/missCforest/issues
+Roxygen: list(markdown = TRUE)
+Depends: 
+    partykit
+Imports:
+    stats
+Language: en-GB
+RoxygenNote: 7.2.1
