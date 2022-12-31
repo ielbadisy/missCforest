@@ -30,6 +30,9 @@ missCforest(
 \item{cores}{number of cores to use or in most cases how many child processes will be run simultaneously.
 This option is initialized at 4 to ensure fast execution.}
 }
+\value{
+complete (i.e. imputed) data.frame.
+}
 \description{
 Single imputation based on the Ensemble Conditional Trees Cforest algorithm.
 }
@@ -65,7 +68,7 @@ since the recursive partitioning of Conditional Trees is based on the multiple t
 \dontrun{
 library(missCforest)
 
-# import the iris dataset 
+# import the iris dataset
 data(iris)
 
 # introduce randomly 30\% of NA to variables
@@ -73,8 +76,8 @@ irisNA <- generateNA(iris, 0.3)
 summary(irisNA)
 
 # impute all the missing values using all the possible combinations of the imputation model formula
-irisImp <- missCforest(irisNA, .~.)  
-summary(irisImp) 
+irisImp <- missCforest(irisNA, .~.)
+summary(irisImp)
 }
 }
 \references{
