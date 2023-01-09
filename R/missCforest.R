@@ -46,6 +46,9 @@
 #' Hothorn T, Hornik K, Zeileis A (2006). "Unbiased Recursive Partitioning: A Conditional
 #' Inference Framework" Journal of Computational and Graphical Statistics, 15(3), 651–674.
 #'
+#' Strobl, C., Boulesteix, A. L., Zeileis, A., & Hothorn, T. (2007). Bias in random forest
+#' variable importance measures: Illustrations, sources and a solution. BMC bioinformatics, 8(1), 1-21.
+#'
 #' Strasser H, Weber C (1999). "On the Asymptotic Theory of Permutation Statistics."
 #' Mathematical Methods of Statistics, 8, 220–250.
 #'
@@ -68,8 +71,7 @@
 #' summary(irisImp)
 #' }
 
-
-missCforest <- function(dat, formula = .~., ntree = 200L,
+missCforest <- function(dat, formula = .~., ntree = 300L,
                         minsplit = 20L, minbucket = 7L, alpha = 0.05, cores = 4){
 
   stopifnot(inherits(formula,"formula"))
@@ -79,23 +81,27 @@ missCforest <- function(dat, formula = .~., ntree = 200L,
   impy <- get_impy(formula, dat)
   impx <- get_impx(formula, dat)
 
+
+  formulas <- paste(impy, "~", deparse(formula[[3]]))
+
   for (i in seq_along(impx)) {
-    p <- impx[i]
+    i_var <- impx[i]
     i_impy <- setdiff(impy, impx[i])
-    formula <- paste(impx[i], " ~ ", paste(i_impy, collapse= " + "))
+    formula <- paste(impx[i], "~", paste(i_impy, collapse= "+"))
 
     i_model <- imputer(cforest,
-                   data=dat,
-                   formula=as.formula(formula),
-                   ntree = ntree,
-                   minsplit = minsplit,
-                   minbucket = minbucket,
-                   alpha = alpha,
-                   cores = cores,
-                   na.action=na.omit)
+                       data=dat,
+                       formula=as.formula(formulas[i]),
+                       ntree = ntree,
+                       minsplit = minsplit,
+                       minbucket = minbucket,
+                       alpha = alpha,
+                       cores = cores,
+                       na.action=na.omit)
 
-    i_na <- is.na(dat[,p])
-    dat[i_na,p] <- predict(i_model, newdata=dat[i_na,,drop=FALSE])
+    i_na <- is.na(dat[, i_var])
+
+    dat[i_na, i_var] <- predict(i_model, newdata=dat[i_na,,drop=FALSE])
   }
   dat
 }

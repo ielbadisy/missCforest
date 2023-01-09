@@ -2,12 +2,14 @@
 # missCforest
 
 `missCforest` is an Ensemble Conditional Trees algorithm for Missing
-Data Imputation. It performs single imputation based on the `Cforest`
-algorithm.
+Data Imputation. It performs single imputation based on the [`Cforest`
+algorithm](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-8-25)
+which is an ensemble of [Conditional Inference
+Trees](https://cran.r-project.org/web/packages/partykit/vignettes/ctree.pdf).
 
-The goal of `missCforest` is to produce a complete dataset using an
-iterative prediction approach by predicting missing values by learning
-from the complete cases.
+The aim of `missCforest` is to produce a complete dataset using an
+iterative prediction approach by predicting missing values after
+learning from the complete cases.
 
 ## Installation
 
@@ -26,48 +28,49 @@ library(missCforest)
 #> Loading required package: grid
 #> Loading required package: libcoin
 #> Loading required package: mvtnorm
-# import the iris dataset 
-data(iris)
+
+# import the GBSG2 dataset
+library(TH.data)
+#> Loading required package: survival
+#> Loading required package: MASS
+#> 
+#> Attaching package: 'TH.data'
+#> The following object is masked from 'package:MASS':
+#> 
+#>     geyser
+data("GBSG2")
+
+# consider the cens variable as a factor
+GBSG2$cens <- as.factor(GBSG2$cens)
 
 # introduce randomly 30% of NA to variables
-irisNA <- generateNA(iris, 0.3)
-summary(irisNA)
-#>   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
-#>  Min.   :4.400   Min.   :2.000   Min.   :1.000   Min.   :0.100  
-#>  1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
-#>  Median :5.700   Median :3.000   Median :4.200   Median :1.400  
-#>  Mean   :5.805   Mean   :3.018   Mean   :3.696   Mean   :1.268  
-#>  3rd Qu.:6.400   3rd Qu.:3.200   3rd Qu.:5.100   3rd Qu.:1.900  
-#>  Max.   :7.900   Max.   :4.100   Max.   :6.700   Max.   :2.500  
-#>  NA's   :45      NA's   :45      NA's   :45      NA's   :45     
-#>        Species  
-#>  setosa    :34  
-#>  versicolor:36  
-#>  virginica :35  
-#>  NA's      :45  
-#>                 
-#>                 
-#> 
+datNA <- missForest::prodNA(GBSG2, 0.2)
+head(datNA)
+#>   horTh age menostat tsize tgrade pnodes progrec estrec time cens
+#> 1    no  70     Post    21     II      3      48     NA 1814    1
+#> 2  <NA>  56     Post    12     II      7      61     77   NA    1
+#> 3   yes  58     Post    35     II      9      52    271   NA <NA>
+#> 4   yes  59     <NA>    17     II      4      60     29   NA    1
+#> 5    no  73     Post    35     II      1      26     65  772 <NA>
+#> 6    no  32      Pre    NA    III     24       0     13  448    1
 ```
 
 You can impute all the missing values using all the possible
 combinations of the imputation model formula:
 
 ``` r
-irisImp <- missCforest(irisNA, .~.)  
-summary(irisImp)
-#>   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width    
-#>  Min.   :4.400   Min.   :2.000   Min.   :1.000   Min.   :0.1000  
-#>  1st Qu.:5.425   1st Qu.:2.900   1st Qu.:1.700   1st Qu.:0.5296  
-#>  Median :5.982   Median :3.007   Median :4.256   Median :1.3641  
-#>  Mean   :5.858   Mean   :3.054   Mean   :3.756   Mean   :1.2422  
-#>  3rd Qu.:6.100   3rd Qu.:3.277   3rd Qu.:5.100   3rd Qu.:1.8000  
-#>  Max.   :7.900   Max.   :4.100   Max.   :6.700   Max.   :2.5000  
-#>        Species  
-#>  setosa    :50  
-#>  versicolor:51  
-#>  virginica :49  
-#>                 
-#>                 
-#> 
+impdat <- missCforest(datNA, .~., 
+                      ntree = 300L,
+                      minsplit = 20L,
+                      minbucket = 7L,
+                      alpha = 0.05,
+                      cores = 4)  
+head(impdat)
+#>   horTh age menostat    tsize tgrade pnodes progrec   estrec      time cens
+#> 1    no  70     Post 21.00000     II      3      48 167.7129 1814.0000    1
+#> 2    no  56     Post 12.00000     II      7      61  77.0000  702.0501    1
+#> 3   yes  58     Post 35.00000     II      9      52 271.0000  970.1270    1
+#> 4   yes  59     Post 17.00000     II      4      60  29.0000 1136.3656    1
+#> 5    no  73     Post 35.00000     II      1      26  65.0000  772.0000    1
+#> 6    no  32      Pre 41.20225    III     24       0  13.0000  448.0000    1
 ```

@@ -7,7 +7,7 @@
 missCforest(
   dat,
   formula = . ~ .,
-  ntree = 200L,
+  ntree = 300L,
   minsplit = 20L,
   minbucket = 7L,
   alpha = 0.05,
@@ -83,6 +83,9 @@ summary(irisImp)
 \references{
 Hothorn T, Hornik K, Zeileis A (2006). "Unbiased Recursive Partitioning: A Conditional
 Inference Framework" Journal of Computational and Graphical Statistics, 15(3), 651–674.
+
+Strobl, C., Boulesteix, A. L., Zeileis, A., & Hothorn, T. (2007). Bias in random forest
+variable importance measures: Illustrations, sources and a solution. BMC bioinformatics, 8(1), 1-21.
 
 Strasser H, Weber C (1999). "On the Asymptotic Theory of Permutation Statistics."
 Mathematical Methods of Statistics, 8, 220–250.
