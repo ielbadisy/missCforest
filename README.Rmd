@@ -1,0 +1,86 @@
+---
+output: github_document
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# missCforest
+
+`missCforest` is an Ensemble Conditional Trees algorithm for Missing Data Imputation. It performs single imputation based on the [`Cforest` algorithm](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-8-25) which is an ensemble of [Conditional Inference Trees](https://jmlr.org/papers/v16/hothorn15a.html). 
+
+The aim of `missCforest` is to produce a complete dataset using an iterative prediction approach by predicting missing values after learning from the complete cases.
+
+## Installing
+
+You can install the development version of `missCforest` as follow:
+
+``` r
+#install.packages("devtools")
+devtools::install_github("ielbadisy/missCforest")
+```
+
+## Examples
+
+```{r}
+library(missCforest)
+
+# import the GBSG2 dataset
+library(TH.data)
+data("GBSG2")
+
+# consider the cens variable as a factor
+GBSG2$cens <- as.factor(GBSG2$cens)
+
+# introduce randomly 30% of NA to variables
+datNA <- missForest::prodNA(GBSG2, 0.2)
+head(datNA)
+```
+
+
+You can impute all the missing values using all the possible combinations of the imputation model formula:
+
+```{r}
+impdat <- missCforest(datNA, .~., 
+                      ntree = 300L,
+                      minsplit = 20L,
+                      minbucket = 7L,
+                      alpha = 0.05,
+                      cores = 4)  
+head(impdat)
+```
+
+## Citing
+
+To cite `missCforest` in publications please use:
+
+> El Badisy I (2023). _missCforest: Ensemble Conditional Trees for Missing
+  Data Imputation_. R package version 0.0.8,
+  <https://CRAN.R-project.org/package=missCforest>.
+
+A BibTeX entry for LaTeX users is
+
+```bibtex
+
+  @Manual{,
+    title = {missCforest: Ensemble Conditional Trees for Missing Data Imputation},
+    author = {Imad {El Badisy}},
+    year = {2023},
+    note = {R package version 0.0.8},
+    url = {https://CRAN.R-project.org/package=missCforest},
+  }
+
+```
+
+## Contributing
+
+- If you encounter any bugs or have an idea for contribution, please [submit an issue](https://github.com/ielbadisy/missCforest/issues).
+
+- Please include a [reprex](https://reprex.tidyverse.org/articles/articles/learn-reprex.html) for reproducibility. 
